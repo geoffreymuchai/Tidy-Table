@@ -17,7 +17,8 @@
 			// default options
 			var settings = {
 				enableCheckbox : false,
-				enableMenu     : false
+				enableMenu     : false,
+				editable       : false
 			};
 
 			if (arguments.length > 1) {
@@ -71,9 +72,6 @@
 		var table = $('<table></table>')
 			.addClass('tidy_table');
 
-		table.mousedown(function() { return false; });
-		table.mouseover(function() { return false; });
-
 		var thead = $('<thead></thead>'),
 			tbody = $('<tbody></tbody>'),
 			row   = $('<tr></tr>');
@@ -126,11 +124,17 @@
 
 			for (var k = 0; k < vals[j].length; k++) {
 				var val = vals[j][k];
-
-				var col = $('<td></td>')
-					.append(val)
-					.attr('title', val);
-				row.append(col);
+				if(data.options && data.options.editable) {
+					var input = $('<input />', {'name':cols[k].toLowerCase(), 'type':'text', value:val});
+					var col = $('<td></td>').append(input);
+					row.append(col);
+				} else {
+					var col = $('<td></td>')
+						.append(val)
+						.attr('title', val);
+					row.append(col);
+				}
+				
 
 				// post-process table column HTML object
 				if (config.postProcess && typeof config.postProcess.column === 'function') {
@@ -286,7 +290,7 @@
 		rows.each(function(index) {
 			var row = $(this);
 
-			var input = row.children().find('input');
+			var input = row.children().find('input[type=checkbox]');
 
 			// update all rows
 			if (num == null) {
